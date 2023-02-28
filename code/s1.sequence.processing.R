@@ -1,15 +1,50 @@
-# DrosEU part A includes QC, read mapping, and re-mapping. The output for this step should be QC reports and summaries, as well as a sorted BAM file for each sample.
+# DrosEU part A includes QC, read mapping, and re-mapping. The output for this step should be 
+# QC reports and summaries, as well as a sorted BAM file for each sample.
 
 
 ## Print versions for all used applications to log file
 
-## Insert fastQC or equivalent here
+############################
+## Generate FastQC report ##
+############################
+## This section generates the FastQC reports for each sample file. Separate reports are 
+## generated for each paired end. Should be combined into single MultiQC report.
 
-# Trim raw FASTQ files using cutadapt
+if (generate.fastqc.reports) {
+  fastqc.command <- paste("fastqc -o", report.folder, 
+                          paste(paste(data.folder, c(sample.table$p1filename, 
+                                                     sample.table$p2filename), sep=""), 
+                                collapse=" "), sep=" ")
+  system(fastqc.command)
+}
 
-    # export PATH=$PATH:scripts/cutadapt-1.8.3/bin
-    # cutadapt -q 18 --minimum-length 75 -o trimmed-read1.fq.gz -p trimmed-read2.fq.gz -b ACACTCTTTCCCTACACGACGCTCTTCCGATC -B CAAGCAGAAGACGGCATACGAGAT -O 15 -n 3 read1.fq.gz read2.fq.gz
+#######################
+## Trim/filter reads ##
+#######################
+## This section runs Cutadapt to trim and filter low quality reads.
+
+if (trim.reads) {
+  for (i in 1:nrow(sample.table)) {
+    # Build system command
+    cutadapt.command <- paste("cutadapt --cores", cutadapt.ncore, 
+                              "--quality-cutoff", cutadapt.minq, 
+                              "--minimum-length", cutadapt.minlength,
+                              "-b", cutadapt.fwdadapter,
+                              "-B", cutadapt.revadapter,
+                              "--overlap", cutadapt.minadapteroverlap,
+                              "--times", cutadapt.adaptercopies,
+                              "-o", paste(data.folder, "/trimmed.", sample.table$p1filename[i], sep=""),
+                              "-p", paste(data.folder, "/trimmed.", sample.table$p2filename[i], sep=""),
+                              "--json", paste(report.folder, "/log.", sample.table$sampleID[i], 
+                                              ".cutadapt.json", sep=""),
+                              sample.table$p1filename[i], sample.table$p2filename[i], sep=" ")
+    # Run command
+    system(cutadapt.command)
+                              
+  }
+}
     
+
 # Map reads to genome using BWA and filter unwanted reads using samtools
 
     # export PATH=$PATH:scripts/samtools-0.1.19

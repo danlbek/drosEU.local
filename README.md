@@ -12,11 +12,33 @@ The full analysis is separated into several scripts to allow for breakpoints aft
 
 The *s1.sequence.processing.R* script requires the *config.R* configuration file. It reads raw FASTQ files, performs basic QC, and maps the quality reads to a reference genome using BWA. The final output will be both QC summary reports as well as sorted BAM files.
 
+## Progress
 
-## Current TODO list
+### Mapping and QC
+| Step   | Draft | Tested | Kamiak | Example | Notes |
+|--------|:-----:|:------:|:------:|:-------:|:-----:|
+|FastQC  |      x|        |        |         |       |
+|Cutadept|      x|        |        |         |       |
+|BWA     |       |        |        |         |       |
+|P-sort  |       |        |        |         |       |
+|P-filter|       |        |        |         |       |
+|P-tag   |       |        |        |         |       |
+|InDels  |       |        |        |         |       |
 
-Outline pipeline and get working mapping step by 2/24. Run on Kamiak test data over weekend. Subsample test data as needed for speed.
+### Decontamination
+| Step   | Draft | Tested | Kamiak | Example | Notes |
+|--------|:-----:|:------:|:------:|:-------:|:-----:|
+|reformat|       |        |        |         |       |
+|bam2fq  |       |        |        |         |       |
+|BWA     |       |        |        |         |       |
+|fixbam  |       |        |        |         |       |
 
-
-
+### SNP calling
+| Step   | Draft | Tested | Kamiak | Example | Notes |
+|--------|:-----:|:------:|:------:|:-------:|:-----:|
+|mpileup |       |        |        |         |       |
+|PoolSNP |       |        |        |         |       |
+|Indels  |       |        |        |         |       |
+|RM TFF  |       |        |        |         |       |
+|annotate|       |        |        |         |       |
 
