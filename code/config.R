@@ -14,24 +14,36 @@ project.description <- ""
 project.folder <- "/test/"
 # Location of project code files
 code.folder <- paste(project.folder, "code/", sep="")
+# Location of external scripts and binary files not loaded using Kamiak modules
+script.folder <- paste(code.folder, "scripts/", sep="")
+# Location of picard jar file (generally within the scripts folder, but could be centrally located)
+picard.folder <- script.folder
+
 # Location of project data files (intermediate files will be stored here as well)
 data.folder <- paste(project.folder, "data/", sep="")
+# Location of reference genomes
+genome.folder <- paste(data.folder, "genome/", sep="")
 # Location to store result files
 result.folder <- paste(project.folder, "results/", sep="")
 # Location to store reports and logs
 report.folder <- paste(project.folder, "reports/", sep="")
 
 # The reference.genome.name is user defined
-reference.genome.name <- ""
-reference.genome.location <- ""
+reference.genome.name <- "dm6"
+reference.genome.file.name <- "GCF_000001215.4_Release_6_plus_ISO1_MT_genomic.fna"
 
 
 ######################
 ### Analysis Flags ###
 ######################
+# Generate FastQC reports for sequencing quality verification
 generate.fastqc.reports <- TRUE
+# Filter and trim reads to remove adapters and low quality bases
 trim.reads <- TRUE
+# Map the reads to the reference genome using Bwa-mem2
 map.reads <- TRUE
+# Process the BAM files using Picard-tools and GTK
+process.bam.to.indel.targets <- TRUE
 
 decontaminate.libraries <- FALSE
 
@@ -87,6 +99,20 @@ cutadapt.minadapteroverlap <- 15
 # Default assumption is at most one adapter will be present but this is modified here
 cutadapt.adaptercopies <- 3
 
+## Mapping parameters
+# Number of cores for parallel processing.
+bwa.ncore <- 1
+# Minimum MAPQ score for mapped reads. All others will be discarded.
+bwa.minq <- 20
+
+## Java options - used by Picard-tools and GATK
+# Xmx20g is a java option limiting the "heap space" (which is a bit less than the total memory used). 
+# Picard documentation recommends using 2g, but the DrosEU documentations uses 20g or 10g depending 
+# on the tool.
+# -Dsnappy.disable=true is apparently a system property. I assume it is disabling snappy compression, 
+# but I have yet to find documentation. It may not be necessary on Kamiak but is kept here since I 
+# don't think it will break anything.
+java.option.string <- "-Xmx10g -Dsnappy.disable=true"
 ##################################
 ### Decontamination parameters ###
 ##################################

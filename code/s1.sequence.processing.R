@@ -44,25 +44,71 @@ if (trim.reads) {
   }
 }
     
+###############
+## Map reads ##
+###############
+# Map reads to genome using BWA. SAM file is passed to Samtools without saving to disk.
+# Samtools filters out low quality reads and saves the file in BAM format.
 
-# Map reads to genome using BWA and filter unwanted reads using samtools
+# Bwa-mem2 may be a better option. It claims to be substantially faster.
+# The 0x100 flag removes secondary alignments
+if (map.reads) {
+  for (i in 1:nrow(sample.table)) {
+    bwa.command <- paste("bwa mem -M -t ", bwa.ncore, " ", genome.folder, "/", reference.genome.file.name,
+                         " ", data.folder, "/trimmed.", sample.table$p1filename[i],
+                         " ", data.folder, "/trimmed.", sample.table$p2filename[i],
+                         " | samtools view -Sbh -q ", bwa.minq, " -F 0x100 -o ", 
+                         data.folder, sample.table$sampleID[i], ".bam", sep="")
+                         
+    source(bwa.command)
+  }
+}
 
-    # export PATH=$PATH:scripts/samtools-0.1.19
-    # export PATH=$PATH:scripts/bwa-0.7.15
-    # bwa mem -M -t 24 reference.fa.gz trimmed-read1.fq.gz trimmed-read2.fq.gz | samtools view -Sbh -q 20 -F 0x100 - > library.bam
+#########################
+## BAM file processing ##
+#########################
+# Using Picard, sort BAM files, remove PCR duplicates and add group tags. DrosEU uses old Picard 
+# version. I've updated it here but should watch for problems.
+# This stores all intermediate BAM files. This should be modified if the intermediate files are not 
+# used downstream.
 
-# Using Picard, sort BAM files, remove PCR duplicates and add group tags
+if (process.bam.to.indel.targets) {
+  for (i in 1:nrow(sample.table)) {
+    
+    # Sort BAM file. 
+    sortsam.command <- paste("java ", java.option.string, " -jar ", picard.folder, "/picard.jar SortSam ",
+                             "I=", data.folder, sample.table$sampleID[i], ".bam ", 
+                             "O=", data.folder, "sorted.", sample.table$sampleID[i], ".bam ", 
+                             "SORT_ORDER=coordinate  VALIDATION_STRINGENCY=SILENT", sep="")
+    system(sortsam.command)
 
-    # java -Xmx20g -Dsnappy.disable=true -jar scripts/picard-tools-1.109/SortSam.jar I=library.bam O=library-sort.bam SO=coordinate VALIDATION_STRINGENCY=SILENT
-    # 
-    # java -Xmx20g -Dsnappy.disable=true -jar scripts/picard-tools-1.109/MarkDuplicates.jar REMOVE_DUPLICATES=true I=library-sort.bam O=library-dedup.bam M=library-dedup.txt VALIDATION_STRINGENCY=SILENT
-    # 
-    # java -jar -Xmx10g scripts/picard-tools-1.109/AddOrReplaceReadGroups.jar INPUT=librtary-dedup.bam OUTPUT=library-dedup_rg.bam SORT_ORDER=coordinate RGID=library RGLB=library RGPL=illumina RGSM=sample RGPU=library CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT
+    # Remove PCR duplicates
+    dedup.command <- paste("java ", java.option.string, " -jar ", picard.folder, "/picard.jar MarkDuplicates ",
+                           "I=", data.folder, "sorted.", sample.table$sampleID[i], ".bam ", 
+                           "O=", data.folder, "dedup.", sample.table$sampleID[i], ".bam ", 
+                           "M=", report.folder, "dedup.metrics.", sample.table$sampleID[i], ".bam ",
+                           "VALIDATION_STRINGENCY=SILENT", sep="")
+    system(dedup.command)
+    
+    # Add read group tags. RGID (ID), RGLB (library), RGSM (sample), and RGPU (barcode) are all set to sample name. 
+    rgtag.command <- paste("java ", java.option.string, " -jar ", picard.folder, 
+                           "/picard.jar AddOrReplaceReadGroups ",
+                           "I=", data.folder, "dedup.", sample.table$sampleID[i], ".bam ", 
+                           "O=", data.folder, "dedup.rg.", sample.table$sampleID[i], ".bam ", 
+                           "SORT_ORDER=coordinate",
+                           " RGID=", sample.table$sampleID[i], 
+                           " RGLB=", sample.table$sampleID[i], 
+                           " RGPL=illumina",
+                           " RGSM=", sample.table$sampleID[i],
+                           " RGPU=", sample.table$sampleID[i], 
+                           " CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT", sep="")
 
-# Generate InDel target list and re=align those positions using GATK
+    # Generate InDel target list and re=align those positions using GATK
 
     # java -Xmx20g -jar scripts/GenomeAnalysisTK-3.4-46/GenomeAnalysisTK.jar -T IndelRealigner -R reference.fa -I library-dedup_rg.bam -targetIntervals library-dedup_rg.list -o library-dedup_rg_InDel.bam
 
+  }
+}
 
 
 

@@ -19,9 +19,9 @@ The *s1.sequence.processing.R* script requires the *config.R* configuration file
 |--------|:-----:|:------:|:------:|:-------:|:-----:|
 |FastQC  |      x|        |        |         |       |
 |Cutadept|      x|        |        |         |       |
-|BWA     |       |        |        |         |       |
-|P-sort  |       |        |        |         |       |
-|P-filter|       |        |        |         |       |
+|BWA     |      x|        |        |         |       |
+|P-sort  |      x|        |        |         |       |
+|P-filter|      x|        |        |         |       |
 |P-tag   |       |        |        |         |       |
 |InDels  |       |        |        |         |       |
 
