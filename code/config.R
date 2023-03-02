@@ -16,8 +16,8 @@ project.folder <- "/test/"
 code.folder <- paste(project.folder, "code/", sep="")
 # Location of external scripts and binary files not loaded using Kamiak modules
 script.folder <- paste(code.folder, "scripts/", sep="")
-# Location of picard jar file (generally within the scripts folder, but could be centrally located)
-picard.folder <- script.folder
+# # Location of picard jar file (generally within the scripts folder, but could be centrally located)
+# picard.folder <- script.folder
 
 # Location of project data files (intermediate files will be stored here as well)
 data.folder <- paste(project.folder, "data/", sep="")
@@ -110,9 +110,9 @@ bwa.minq <- 20
 # Picard documentation recommends using 2g, but the DrosEU documentations uses 20g or 10g depending 
 # on the tool.
 # -Dsnappy.disable=true is apparently a system property. I assume it is disabling snappy compression, 
-# but I have yet to find documentation. It may not be necessary on Kamiak but is kept here since I 
-# don't think it will break anything.
-java.option.string <- "-Xmx10g -Dsnappy.disable=true"
+# but I have yet to find documentation. It may not be necessary on Kamiak. I've removed it here.
+java.option.string <- "-Xmx10g"
+
 ##################################
 ### Decontamination parameters ###
 ##################################

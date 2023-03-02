@@ -22,8 +22,8 @@ The *s1.sequence.processing.R* script requires the *config.R* configuration file
 |BWA     |      x|        |        |         |       |
 |P-sort  |      x|        |        |         |       |
 |P-filter|      x|        |        |         |       |
-|P-tag   |       |        |        |         |       |
-|InDels  |       |        |        |         |       |
+|P-tag   |      x|        |        |         |       |
+|InDels  |      x|        |        |         |       |
 
 ### Decontamination
 | Step   | Draft | Tested | Kamiak | Example | Notes |

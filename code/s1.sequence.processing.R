@@ -1,7 +1,6 @@
 # DrosEU part A includes QC, read mapping, and re-mapping. The output for this step should be 
 # QC reports and summaries, as well as a sorted BAM file for each sample.
 
-
 ## Print versions for all used applications to log file
 
 ############################
@@ -68,7 +67,8 @@ if (map.reads) {
 ## BAM file processing ##
 #########################
 # Using Picard, sort BAM files, remove PCR duplicates and add group tags. DrosEU uses old Picard 
-# version. I've updated it here but should watch for problems.
+# version. I've updated it here but should watch for problems. The Kamiak version of Picard is an
+# intermediate version.
 # This stores all intermediate BAM files. This should be modified if the intermediate files are not 
 # used downstream.
 
@@ -102,11 +102,26 @@ if (process.bam.to.indel.targets) {
                            " RGSM=", sample.table$sampleID[i],
                            " RGPU=", sample.table$sampleID[i], 
                            " CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT", sep="")
-
-    # Generate InDel target list and re=align those positions using GATK
-
-    # java -Xmx20g -jar scripts/GenomeAnalysisTK-3.4-46/GenomeAnalysisTK.jar -T IndelRealigner -R reference.fa -I library-dedup_rg.bam -targetIntervals library-dedup_rg.list -o library-dedup_rg_InDel.bam
-
+    system(rgtag.command)
+    
+    # Generate InDel target list and re=align those positions using GATK3
+    # These functions are eliminated in GATK4. GATK3 is no longer supported. Does it make sense to keep 
+    # this analysis in place? GATK3 is present as a Kamiak module, so keeping for now.
+    gatk3.target.command <- paste("java ", java.option.string, " -jar GenomeAnalysisTK.jar", 
+                                  " -T RealignerTargetCreator -R ", genome.folder, reference.genome.file.name,
+                                  " -I ", data.folder, "dedup.rg.", sample.table$sampleID[i], ".bam",
+                                  " -o ", data.folder, "dedup.rg.", sample.table$sampleID[i], ".list",
+                                  sep="")
+    system(gatk3.target.command)
+    
+    gatk3.realign.command <- paste("java ", java.option.string, " -jar GenomeAnalysisTK.jar", 
+                                   " -T IndelRealigner -R ", genome.folder, reference.genome.file.name,
+                                   " -I ", data.folder, "dedup.rg.", sample.table$sampleID[i], ".bam",
+                                   " -targetIntervals ", data.folder, "dedup.rg.", sample.table$sampleID[i], ".list",
+                                   " -o ", data.folder, "dedup.rg.indel.", sample.table$sampleID[i], ".bam",
+                                   sep="")
+    system(gatk3.realign.command)
+    
   }
 }
 
