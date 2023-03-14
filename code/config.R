@@ -9,15 +9,19 @@
 # Give the project any name and description. These will be used in the reports. 
 # It might be good practice to also use the project.name as the project folder name.
 project.name <- "test"
-project.description <- ""
+project.description <- "Small synthetic test set"
 
-project.folder <- "/test/"
+project.folder <- "~/test/"
 # Location of project code files
 code.folder <- paste(project.folder, "code/", sep="")
 # Location of external scripts and binary files not loaded using Kamiak modules
-script.folder <- paste(code.folder, "scripts/", sep="")
-# # Location of picard jar file (generally within the scripts folder, but could be centrally located)
-# picard.folder <- script.folder
+script.folder <- paste(code.folder, "tools/", sep="")
+## Both Picard and GATK are available as Kamiak modules. I'm using a local version here since
+## the DrosEU pipeline requires obselete functions only available in GATK 3.8.
+# Location of picard jar file
+picard.folder <- paste(script.folder, "picard/", sep="")
+# Location of gatk jar file
+gatk.folder <- paste(script.folder, "gatk3.8/", sep="")
 
 # Location of project data files (intermediate files will be stored here as well)
 data.folder <- paste(project.folder, "data/", sep="")
@@ -37,11 +41,13 @@ reference.genome.file.name <- "GCF_000001215.4_Release_6_plus_ISO1_MT_genomic.fn
 ### Analysis Flags ###
 ######################
 # Generate FastQC reports for sequencing quality verification
-generate.fastqc.reports <- TRUE
+generate.fastqc.reports <- FALSE
 # Filter and trim reads to remove adapters and low quality bases
-trim.reads <- TRUE
+trim.reads <- FALSE
+# Index reference genome (required for BWA, but generated index can be copied to other projects)
+create.bwa.index <- FALSE
 # Map the reads to the reference genome using Bwa-mem2
-map.reads <- TRUE
+map.reads <- FALSE
 # Process the BAM files using Picard-tools and GTK
 process.bam.to.indel.targets <- TRUE
 
@@ -54,25 +60,34 @@ decontaminate.libraries <- FALSE
 # This table links a sample name with the files associated with that sample. This may be
 # better implemented as a sample spreadsheet that is imported by the pipeline.
 
+# sample.table <- data.frame(
+#   sampleID = c("LD7", "LD11", "LD18", "LD24", "LD29", "LD34", 
+#                "ZE10", "ZE14", "ZE17", "ZE22", "ZE30", "ZE31"),
+#   p1filename = c("18057XD-04-12_S0_L001_R1_001.fastq.gz", "18057XD-04-13_S0_L001_R1_001.fastq.gz",
+#                  "18057XD-04-14_S0_L001_R1_001.fastq.gz", "18057XD-04-15_S0_L001_R1_001.fastq.gz",
+#                  "18057XD-04-16_S0_L001_R1_001.fastq.gz", "18057XD-04-17_S0_L001_R1_001.fastq.gz", 
+#                  "18057XD-04-06_S0_L001_R1_001.fastq.gz", "18057XD-04-07_S0_L001_R1_001.fastq.gz",
+#                  "18057XD-04-08_S0_L001_R1_001.fastq.gz", "18057XD-04-09_S0_L001_R1_001.fastq.gz",
+#                  "18057XD-04-10_S0_L001_R1_001.fastq.gz", "18057XD-04-11_S0_L001_R1_001.fastq.gz"),
+#   p2filename =c("18057XD-04-12_S0_L001_R2_001.fastq.gz", "18057XD-04-13_S0_L001_R2_001.fastq.gz",
+#                 "18057XD-04-14_S0_L001_R2_001.fastq.gz", "18057XD-04-15_S0_L001_R2_001.fastq.gz",
+#                 "18057XD-04-16_S0_L001_R2_001.fastq.gz", "18057XD-04-17_S0_L001_R2_001.fastq.gz", 
+#                 "18057XD-04-06_S0_L001_R2_001.fastq.gz", "18057XD-04-07_S0_L001_R2_001.fastq.gz",
+#                 "18057XD-04-08_S0_L001_R2_001.fastq.gz", "18057XD-04-09_S0_L001_R2_001.fastq.gz",
+#                 "18057XD-04-10_S0_L001_R2_001.fastq.gz", "18057XD-04-11_S0_L001_R2_001.fastq.gz"),
+#   metadata = c(rep("LD", 6), rep("ZE", 6)),
+#   stringsAsFactors = F
+# )
+
 sample.table <- data.frame(
-  sampleID = c("LD7", "LD11", "LD18", "LD24", "LD29", "LD34", 
-               "ZE10", "ZE14", "ZE17", "ZE22", "ZE30", "ZE31"),
-  p1filename = c("18057XD-04-12_S0_L001_R1_001.fastq.gz", "18057XD-04-13_S0_L001_R1_001.fastq.gz",
-                 "18057XD-04-14_S0_L001_R1_001.fastq.gz", "18057XD-04-15_S0_L001_R1_001.fastq.gz",
-                 "18057XD-04-16_S0_L001_R1_001.fastq.gz", "18057XD-04-17_S0_L001_R1_001.fastq.gz", 
-                 "18057XD-04-06_S0_L001_R1_001.fastq.gz", "18057XD-04-07_S0_L001_R1_001.fastq.gz",
-                 "18057XD-04-08_S0_L001_R1_001.fastq.gz", "18057XD-04-09_S0_L001_R1_001.fastq.gz",
-                 "18057XD-04-10_S0_L001_R1_001.fastq.gz", "18057XD-04-11_S0_L001_R1_001.fastq.gz"),
-  p2filename =c("18057XD-04-12_S0_L001_R2_001.fastq.gz", "18057XD-04-13_S0_L001_R2_001.fastq.gz",
-                "18057XD-04-14_S0_L001_R2_001.fastq.gz", "18057XD-04-15_S0_L001_R2_001.fastq.gz",
-                "18057XD-04-16_S0_L001_R2_001.fastq.gz", "18057XD-04-17_S0_L001_R2_001.fastq.gz", 
-                "18057XD-04-06_S0_L001_R2_001.fastq.gz", "18057XD-04-07_S0_L001_R2_001.fastq.gz",
-                "18057XD-04-08_S0_L001_R2_001.fastq.gz", "18057XD-04-09_S0_L001_R2_001.fastq.gz",
-                "18057XD-04-10_S0_L001_R2_001.fastq.gz", "18057XD-04-11_S0_L001_R2_001.fastq.gz"),
-  metadata = c(rep("LD", 6), rep("ZE", 6)),
+  sampleID = c("g1.rss1", "g1.rss2", "g1.rss3", "g2.rss1", "g2.rss2", "g2.rss3"),
+  p1filename = c("test.g1.rss1.R1.fastq.gz", "test.g1.rss2.R1.fastq.gz", "test.g1.rss3.R1.fastq.gz",
+                 "test.g2.rss1.R1.fastq.gz", "test.g2.rss2.R1.fastq.gz", "test.g2.rss3.R1.fastq.gz"),
+  p2filename =c("test.g1.rss1.R2.fastq.gz", "test.g1.rss2.R2.fastq.gz", "test.g1.rss3.R2.fastq.gz",
+                "test.g2.rss1.R2.fastq.gz", "test.g2.rss2.R2.fastq.gz", "test.g2.rss3.R2.fastq.gz"),
+  metadata = c(rep("g1", 3), rep("g2", 3)),
   stringsAsFactors = F
 )
-
 
 
 ######################
@@ -101,7 +116,7 @@ cutadapt.adaptercopies <- 3
 
 ## Mapping parameters
 # Number of cores for parallel processing.
-bwa.ncore <- 1
+bwa.ncore <- 4
 # Minimum MAPQ score for mapped reads. All others will be discarded.
 bwa.minq <- 20
 

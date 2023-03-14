@@ -17,13 +17,13 @@ The *s1.sequence.processing.R* script requires the *config.R* configuration file
 ### Mapping and QC
 | Step   | Draft | Tested | Kamiak | Example | Notes |
 |--------|:-----:|:------:|:------:|:-------:|:-----:|
-|FastQC  |      x|        |        |         |       |
-|Cutadept|      x|        |        |         |       |
-|BWA     |      x|        |        |         |       |
-|P-sort  |      x|        |        |         |       |
-|P-filter|      x|        |        |         |       |
-|P-tag   |      x|        |        |         |       |
-|InDels  |      x|        |        |         |       |
+|FastQC  |      x|       x|        |         |       |
+|Cutadept|      x|       x|        |         |       |
+|BWA     |      x|       x|        |         |       |
+|P-sort  |      x|       x|        |         |       |
+|P-filter|      x|       x|        |         |       |
+|P-tag   |      x|       x|        |         |       |
+|InDels  |      x| skipped|        |         |       |
 
 ### Decontamination
 | Step   | Draft | Tested | Kamiak | Example | Notes |
