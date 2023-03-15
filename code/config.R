@@ -132,6 +132,6 @@ java.option.string <- "-Xmx10g"
 ### Decontamination parameters ###
 ##################################
 
-contamination.genome.name <- "D. simulans"
-contamination.genome.location <- ""
+contamination.genome.name <- "Drosophila simulans"
+contamination.genome.file.name <- "GCF_016746395.2_Prin_Dsim_3.1_genomic.fna.gz"
 

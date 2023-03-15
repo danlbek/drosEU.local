@@ -28,10 +28,10 @@ The *s1.sequence.processing.R* script requires the *config.R* configuration file
 ### Decontamination
 | Step   | Draft | Tested | Kamiak | Example | Notes |
 |--------|:-----:|:------:|:------:|:-------:|:-----:|
-|reformat|       |        |        |         |       |
-|bam2fq  |       |        |        |         |       |
-|BWA     |       |        |        |         |       |
-|fixbam  |       |        |        |         |       |
+|reformat|      x|        |        |         |       |
+|bam2fq  |      x|        |        |         |       |
+|BWA     |      x|        |        |         |       |
+|fixbam  |      x|        |        |         |       |
 
 ### SNP calling
 | Step   | Draft | Tested | Kamiak | Example | Notes |
