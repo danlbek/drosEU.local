@@ -95,8 +95,8 @@ sample.table <- data.frame(
 ######################
 
 ## Cutadapt parameters. There are many other options and settings available through Cutadapt.
-## Only the parameters used in the DrosEU pipeline are shown here, but added flexibility can
-## be added as needed. Most defaults are taken from the DrosEU pipeline.
+## Only the parameters used in the DrosEU pipeline are shown here, but flexibility can be 
+## added as needed. Most defaults are taken from the DrosEU pipeline.
 
 # Number of cores for parallel processing. Default is set to use all available
 cutadapt.ncore <- 0
@@ -134,4 +134,67 @@ java.option.string <- "-Xmx10g"
 
 contamination.genome.name <- "Drosophila simulans"
 contamination.genome.file.name <- "GCF_016746395.2_Prin_Dsim_3.1_genomic.fna.gz"
+
+##############################
+### SNP calling parameters ###
+##############################
+
+## Pileup file generation
+pileup.min.mapping.quality <- 20
+pileup.min.base.quality <- 20
+
+## PoolSNP.sh SNP calling
+poolsnp.names <- c()
+poolsnp.maxcov <- 0.99
+poolsnp.mincov <- 10
+poolsnp.mincount <- 10
+poolsnp.minfreq <- 0.001
+poolsnp.missfrac <- 0.2
+poolsnp.jobs <- 4 # This should be combined with other available thread parameters by default
+
+## DetectIndels.py InDel masking
+detectindel.minimum.count <- 20
+detectindel.mask <- 5
+
+## RepeatMasker
+repeatmasker.pa <- 20
+
+## snpEFF
+snpeff.ud <- 2000
+
+## SubsampleSync.py
+subsamplesync.targetcov <- 40
+subsamplesync.mincov <- 10
+
+## TrueWindows.py
+truewindows.window <- 200000
+truewindows.step <- 200000
+
+## PoolGen_var.py
+poolgenvar.poolsize <- c(rep(80,35), 66, rep(80,8), 70, rep(80,3))
+poolgenvar.mincount <- 2
+poolgenvar.window <- 200000
+poolgenvar.step <- 200000
+poolgenvar.minsitesfrac <- 0.75
+
+## IntronicSnps.py
+intronicsnps.targetlength <- 60
+
+## FilterByRecomRateNInversion.py
+filterinversions.D <- 1000000 
+filterinversions.r <- 3 
+
+## FST.py
+fst.poolsize <- poolgenvar.poolsize ## Both these should be specified in a more general way.
+fst.minimumcount <- 2 
+fst.minimumcov <- 10 
+
+## CombineFST.py
+combinefst.stat <- 0
+
+
+
+
+
+
 

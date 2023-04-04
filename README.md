@@ -12,6 +12,14 @@ The full analysis is separated into several scripts to allow for breakpoints aft
 
 The *s1.sequence.processing.R* script requires the *config.R* configuration file. It reads raw FASTQ files, performs basic QC, and maps the quality reads to a reference genome using BWA. The final output will be both QC summary reports as well as sorted BAM files.
 
+The *s2.decontamination.R* script requires the *config.R* configuration file and the output files from *s1.sequence.processing.R*. It removes any potential *D. simulans* contamination.
+
+The *s3.snp.analysis.R* script requires the *config.R* configuration file and the output files from *s1.sequence.processing.R*. It generates the Pileup file combining all study samples and calls SNPs. It then filters SNPs based on several characteristics. Finally, the script annotates any identified SNPs.
+
+The *s4.additional.analyses.R* script requires the *config.R* configuration file and the output files from *s1.sequence.processing.R* and *s3.snp.analysis.R*. It performs several analyses including calculation of Watterson's Theta, Tajima's D, Tajima's pi, pairwise Fst, isolation by distance, and other values.
+
+The *s5.generate.reports.R* script requires the *config.R* configuration file and the output from the previous pipeline steps. It generates a summary of the pipeline results, including QC metrics, a description of the analyses performed with parameter values, and relevant figures and tables.
+
 ## Progress
 
 ### Mapping and QC
@@ -28,17 +36,36 @@ The *s1.sequence.processing.R* script requires the *config.R* configuration file
 ### Decontamination
 | Step   | Draft | Tested | Kamiak | Example | Notes |
 |--------|:-----:|:------:|:------:|:-------:|:-----:|
-|reformat|      x|        |        |         |       |
-|bam2fq  |      x|        |        |         |       |
-|BWA     |      x|        |        |         |       |
-|fixbam  |      x|        |        |         |       |
+|reformat|      x| skipped|        |         |       |
+|bam2fq  |      x| skipped|        |         |       |
+|BWA     |      x| skipped|        |         |       |
+|fixbam  |      x| skipped|        |         |       |
 
 ### SNP calling
 | Step   | Draft | Tested | Kamiak | Example | Notes |
 |--------|:-----:|:------:|:------:|:-------:|:-----:|
-|mpileup |       |        |        |         |       |
-|PoolSNP |       |        |        |         |       |
-|Indels  |       |        |        |         |       |
-|RM TFF  |       |        |        |         |       |
-|annotate|       |        |        |         |       |
+|mpileup |      x|       x|        |         |       |
+|PoolSNP |      x|        |        |         |       |
+|Indels  |      x|        |        |         |       |
+|RM TFF  |      x|        |        |         |       |
+|annotate|      x|        |        |         |       |
+
+### Additional analyses
+| Step   | Draft | Tested | Kamiak | Example | Notes |
+|--------|:-----:|:------:|:------:|:-------:|:-----:|
+|pi/tht/D|      x|        |        |         |       |
+|Fst     |      x|        |        |         |       |
+|IBD     |      x|        |        |         |       |
+|A freq  |      x|        |        |         |       |
+|PCA     |       |        |        |         |       |
+|pop strc|       |        |        |         |       |
+
+### Reports
+| Step   | Draft | Tested | Kamiak | Example | Notes |
+|--------|:-----:|:------:|:------:|:-------:|:-----:|
+|QC      |       |        |        |         |       |
+|summary |       |        |        |         |       |
+|results |       |        |        |         |       |
+
+
 
